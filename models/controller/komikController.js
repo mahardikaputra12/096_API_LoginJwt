@@ -1,79 +1,61 @@
 const db = require('../models');
+const Komik = db.Komik;
 
-async function getAllKomik(req, res){
+async function getAllKomik(req, res) {
     try {
-        const komik = await db.Komik.findAll();
-        res.status(200).json(komik);
-    }
-    catch (err) {
-        console.error('Error fetching komik: ', err.message);
-        res.status(500).json({error: 'Ga bisa fetch komik nya' });
+        const komik = await Komik.findAll();
+        return res.status(200).json(komik);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
     }
 }
 
-async function getKomikById(req,res) {
-    const { id } = req.params;
+async function getKomikById(req, res) {
     try {
-        const komik = await db.Komik.findByPk(id);
+        const komik = await Komik.findByPk(req.params.id);
         if (!komik) {
-            return res.status(404).json({error: 'Komik tidak ditemukan'});
-
+            return res.status(404).json({ message: 'Komik tidak ditemukan' });
         }
-        res.status(200).json(komik);
-
-    }catch (err) {
-        console.error('error fetching komik by id:', err.message);
-        res.status(500).json({error: 'Failed euy gabisa gatau'});
-
+        return res.status(200).json(komik);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
     }
 }
 
 async function createKomik(req, res) {
-    const {title, description, author } = req.body || {};
     try {
-        const newKomik = await db.Komik.create({ title, description, author });
-        res.status(201).json(newKomik);
-
-    } catch (err) {
-        console.error('Error bikin komik nya', err.message);
-        res.status(500).json({error: 'Gagal bikin komik nya'});
+        const { title, description, author } = req.body;
+        const komik = await Komik.create({ title, description, author });
+        return res.status(201).json(komik);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
     }
 }
 
 async function updateKomik(req, res) {
-    const { id } = req.params;
-    const {title, description, author} = req.body || {};
     try {
-        const komik = await db.Komik.findByPk(id);
+        const { title, description, author } = req.body;
+        const komik = await Komik.findByPk(req.params.id);
         if (!komik) {
-            return res.status(404).json({error: 'Komik tidak ketemu'});
+            return res.status(404).json({ message: 'Komik tidak ditemukan' });
         }
-        komik.title = title;
-        komik.description = description;
-        komik.author = author;
-        await komik.save();
-        res.status(200).json(komik);
-
-    }
-    catch (err) {
-        console.error('Error update buku nya', err.message);
-        res.status(500).json({error: 'Gagal update bukuuuu' });
+        await komik.update({ title, description, author });
+        return res.status(200).json(komik);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
     }
 }
 
 async function deleteKomik(req, res) {
-    const { id } = req.params;
     try {
-        const komik = await db.Komik.findByPk(id);
+        const komik = await Komik.findByPk(req.params.id);
         if (!komik) {
-            return res.status(404).json({ error: 'Komik ga di temuin'});
+            return res.status(404).json({ message: 'Komik tidak ditemukan' });
         }
         await komik.destroy();
-        res.status(200).json({message: 'Komik bisa di delete'});
-    }
-    catch (err) {
-        console.error('Error, gabisa di delete:', err.message);
-        res.status(500).json({error: 'gagal gabisa pokoknya' });
+        return res.status(200).json({ message: 'Komik berhasil dihapus' });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
     }
 }
 
