@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const komikController = require("../controller/komikController");
+const userController = require("../controller/userController");
+const authMiddleware = require("../middleware/authMiddleware");
 
-// Define routes
+// Auth routes
 router.get("/komik", komikController.getAllKomik);
 router.get("/komik/:id", komikController.getKomikById);
 router.post("/komik", komikController.createKomik);
